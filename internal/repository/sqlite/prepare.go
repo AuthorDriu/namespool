@@ -1,9 +1,13 @@
-package repository
+package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
+	"os"
 	"sync"
+
+	"github.com/AuthorDriu/namespool/pkg/path"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,7 +21,7 @@ var db database
 
 const schemaSQL = `
 CREATE TABLE IF NOT EXISTS users (
-	id        INT PRIMARY KEY,
+	id        INTEGER PRIMARY KEY AUTOINCREMENT,
 	nickname  VARCHAR(50) UNIQUE NOT NULL,
 	password  BLOB NOT NULL
 );
@@ -34,13 +38,21 @@ CREATE TABLE IF NOT EXISTS ideas (
 	FOREIGN KEY (owner) REFERENCES users(nickname) 
 );
 
-CREATE INDEX IF NOT EXISTS idea_owner ON ideas(owner);
-`
+CREATE INDEX IF NOT EXISTS idea_owner ON ideas(owner);`
 
-func Prepare(path string) error {
-	const op string = "repositiry.sqlite.Prepare()"
+func Prepare(pathToDatabaseFile string) error {
+	const op = "repositiry.sqlite.Prepare()"
+	pathToDatabaseFile = path.FromRoot(pathToDatabaseFile)
 
-	conn, err := sql.Open("sqlite3", path)
+	if _, err := os.Stat(pathToDatabaseFile); errors.Is(err, os.ErrNotExist) {
+		if file, err := os.Create(pathToDatabaseFile); err != nil {
+			return fmt.Errorf("%q: %v", op, err)
+		} else {
+			file.Close()
+		}
+	}
+
+	conn, err := sql.Open("sqlite3", pathToDatabaseFile)
 	if err != nil {
 		return fmt.Errorf("%s: %v", op, err)
 	}
@@ -51,5 +63,13 @@ func Prepare(path string) error {
 	}
 
 	db = database{conn: conn}
+	return nil
+}
+
+func Close() error {
+	const op = "repository.sqlite.Close()"
+	if err := db.conn.Close(); err != nil {
+		return fmt.Errorf("%q: %v", op, err)
+	}
 	return nil
 }

@@ -1,6 +1,10 @@
-package model
+package repository
 
-import "errors"
+type User struct {
+	Id       int
+	Nickname string // unique nickname
+	Password []byte // hashed password
+}
 
 type AccessModifier int
 
@@ -15,8 +19,4 @@ type Idea struct {
 	Description string
 	Access      AccessModifier
 	Owner       string // users.nickname in db
-}
-
-func NewNameIdia(title string, description string, owner string) (*Idea, error) {
-	return nil, errors.New("not implemented")
 }

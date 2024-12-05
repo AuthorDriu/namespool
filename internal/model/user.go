@@ -1,21 +1,26 @@
 package model
 
-import "errors"
+import (
+	"errors"
+	"fmt"
 
-type User struct {
-	Id       int
-	Nickname string // unique nickname
-	Password []byte // hashed password
-}
+	"github.com/AuthorDriu/namespool/internal/repository"
+	"github.com/AuthorDriu/namespool/internal/repository/sqlite"
+)
 
 var ErrNotUniqueUsername = errors.New("not unique user")
 
-func NewUser(nickname string, password []byte) (*User, error) {
+func NewUser(nickname string, password []byte) (*repository.User, error) {
+	const op = "model.NewUser()"
 
-	newUser := &User{
-		Nickname: nickname,
-		Password: password,
+	id, err := sqlite.InsertUser(nickname, password)
+	if err != nil {
+		return nil, fmt.Errorf("%q: %v", op, err)
 	}
 
-	return newUser, errors.New("not implemented")
+	return &repository.User{
+		Id:       id,
+		Nickname: nickname,
+		Password: password,
+	}, nil
 }
