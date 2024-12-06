@@ -42,18 +42,18 @@ func SelectUser(nickname string) (*repository.User, error) {
 	db.mux.Unlock()
 
 	var (
-		id        int64
-		_nickname string
-		password  []byte
+		user_id       int64
+		user_nickname string
+		user_password []byte
 	)
-	err := row.Scan(&id, &_nickname, &password)
+	err := row.Scan(&user_id, &user_nickname, &user_password)
 	if err != nil {
 		return nil, fmt.Errorf("%q: %v", op, err)
 	}
 
 	return &repository.User{
-		Id:       int(id),
-		Nickname: _nickname,
-		Password: password,
+		Id:       int(user_id),
+		Nickname: user_nickname,
+		Password: user_password,
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/AuthorDriu/namespool/internal/repository"
 	repo "github.com/AuthorDriu/namespool/internal/repository/sqlite"
 	"github.com/AuthorDriu/namespool/pkg/path"
 )
@@ -22,14 +23,15 @@ type userTestData struct {
 	password []byte
 }
 
-var testData = []userTestData{
+var userData = []userTestData{
 	{nickname: "cactus", password: []byte("supercactushero")},
 	{nickname: "gurenlagan", password: []byte("iveneverwatchedgurenlagan")},
 	{nickname: "mikhail", password: []byte("123")},
+	{nickname: "егорычзмей", password: []byte("esnake")},
 }
 
 func TestInsertUser(t *testing.T) {
-	for _, data := range testData {
+	for _, data := range userData {
 		_, err := repo.InsertUser(data.nickname, data.password)
 		if err != nil {
 			t.Errorf("%v, params: %v", err, data)
@@ -38,13 +40,80 @@ func TestInsertUser(t *testing.T) {
 }
 
 func TestSelectUser(t *testing.T) {
-	for _, data := range testData {
+	for _, data := range userData {
 		user, err := repo.SelectUser(data.nickname)
 		if err != nil {
 			t.Errorf("%v, params: %q", err, data.nickname)
-
 		} else if !reflect.DeepEqual(user.Password, data.password) {
 			t.Errorf("passwords are not equal: from db %v, test data %v", user.Password, data.password)
+		}
+	}
+}
+
+type ideaTestData struct {
+	title       string
+	description string
+	access      repository.AccessModifier
+	owner       string
+}
+
+var ideaData = []ideaTestData{
+	{title: "hug", description: "just hugs", access: repository.IdeaPublic, owner: "cactus"},
+	{title: "suka", description: "insulting project", access: repository.IdeaPublic, owner: "cactus"},
+	{title: "bliat", description: "second insulting project", access: repository.IdeaPublic, owner: "cactus"},
+	{title: "haha", description: "", access: repository.IdeaPrivate, owner: "cactus"},
+}
+
+func TestInsertIdea(t *testing.T) {
+	for _, idea := range ideaData {
+		_, err := repo.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
+func TestInsertNotUniqueIdea(t *testing.T) {
+	idea := ideaData[0]
+	_, err := repo.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
+	if err == nil {
+		t.Error("Inserted not unique idea")
+	}
+}
+
+func TestSelectIdea(t *testing.T) {
+	ideaData := ideaData[0]
+	idea, err := repo.SelectIdea(ideaData.owner, ideaData.title)
+	if err != nil {
+		t.Errorf("%v, params: {%q, %q}", err, ideaData.owner, ideaData.title)
+	} else if idea.Title != ideaData.title {
+		t.Errorf("Wrong result! %q != %q", idea.Title, ideaData.title)
+	}
+}
+
+func TestSelectIdeasByUser(t *testing.T) {
+	ideas, err := repo.SelectIdeasByUser(ideaData[0].owner)
+	if err != nil {
+		t.Errorf("%v, params: %q", err, ideaData[0].owner)
+	} else if len(ideas) != len(ideaData) {
+		t.Errorf("Wrong result (wrong length) %d != %d:", len(ideas), len(ideaData))
+	}
+}
+
+func TestSelectPublicIdeasByUser(t *testing.T) {
+	ideas, err := repo.SelectPublicIdeasByUser(ideaData[0].owner)
+	if err != nil {
+		t.Errorf("%v, params: %q", err, ideaData[0].owner)
+	} else if len(ideas) != len(ideaData)-1 {
+		t.Errorf("Wrong result (wrong length) %d != %d:", len(ideas), len(ideaData)-1)
+	}
+}
+
+func TestDeleteIdea(t *testing.T) {
+	for _, idea := range ideaData {
+		err := repo.DeleteIdea(idea.owner, idea.title)
+		if err != nil {
+			t.Error(err)
 		}
 	}
 }

@@ -9,8 +9,8 @@ type User struct {
 type AccessModifier int
 
 const (
-	Public  AccessModifier = 1
-	Private AccessModifier = 0
+	IdeaPublic  AccessModifier = 1
+	IdeaPrivate AccessModifier = 0
 )
 
 type Idea struct {

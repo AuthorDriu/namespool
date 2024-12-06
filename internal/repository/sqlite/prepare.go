@@ -29,16 +29,17 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE UNIQUE INDEX IF NOT EXISTS user_nickname ON users(nickname); 
 
 CREATE TABLE IF NOT EXISTS ideas (
-	id INT PRIMARY KEY,
-	title VARCHAR(250) NOT NULL,
-	description TEXT,
-	access INT NOT NULL,
-	owner VARCHAR(50) NOT NULL,
+	id           INTEGER PRIMARY KEY AUTOINCREMENT,
+	title        VARCHAR(250) NOT NULL,
+	description  TEXT,
+	access       INTEGER NOT NULL,
+	owner        VARCHAR(50) NOT NULL,
 
 	FOREIGN KEY (owner) REFERENCES users(nickname) 
 );
 
-CREATE INDEX IF NOT EXISTS idea_owner ON ideas(owner);`
+CREATE INDEX IF NOT EXISTS idea_owner ON ideas(owner);
+CREATE UNIQUE INDEX IF NOT EXISTS users_idea ON ideas(title, owner);`
 
 func Prepare(pathToDatabaseFile string) error {
 	const op = "repositiry.sqlite.Prepare()"
