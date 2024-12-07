@@ -9,12 +9,12 @@ import (
 	jwt "github.com/golang-jwt/jwt/v5"
 )
 
-func getSecretKey() (string, error) {
+func getSecretKey() ([]byte, error) {
 	secretKey := os.Getenv("SECRETKEY")
 	if secretKey == "" {
-		return "", errors.New("SECRETKEY required in environ variables")
+		return nil, errors.New("SECRETKEY required in environ variables")
 	}
-	return secretKey, nil
+	return []byte(secretKey), nil
 }
 
 func GenerateJWT(nickname string) (string, error) {
@@ -63,12 +63,12 @@ func ParseJWT(tokenString string) (string, error) {
 		return "", fmt.Errorf("%q: %v", op, errors.New("cannot read MapClaims"))
 	}
 
-	exp, ok := claims["exp"].(int64)
+	exp, ok := claims["exp"].(float64)
 	if !ok {
 		return "", fmt.Errorf("%q: %v", op, errors.New("cannot read exp"))
 	}
 
-	if exp < time.Now().Unix() {
+	if int64(exp) < time.Now().Unix() {
 		return "", fmt.Errorf("%q: %v", op, errors.New("token expired"))
 	}
 

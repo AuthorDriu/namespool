@@ -1,22 +1,19 @@
 package secure
 
 import (
-	"reflect"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 func EnctyptPassord(password string) ([]byte, error) {
+	if len(password) > 72 {
+		return nil, fmt.Errorf("too long password")
+	}
+
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
 func ValidatePassword(password string, passwordEnctypted []byte) bool {
-	encrypted, err := EnctyptPassord(password)
-	if err != nil {
-		return false
-	}
-	if !reflect.DeepEqual(encrypted, passwordEnctypted) {
-		return false
-	}
-	return true
+	return bcrypt.CompareHashAndPassword(passwordEnctypted, []byte(password)) != nil
 }

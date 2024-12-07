@@ -1,3 +1,5 @@
-export NAMESPOOL_ROOT="$(pwd)"
+export NAMESPOOLROOT="$(pwd)"
+export SECRETKEY="slfdgakjghakjvngdjksvnjkabsdgvjkasdsnfnasddjkfvnasksjvnksnvajvnjkanvnvkljnkjlavbl"
 $*
-export NAMESPOOL_ROOT=""
+export NAMESPOOLROOT=""
+export SECRETKEY=""

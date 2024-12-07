@@ -6,7 +6,7 @@ import (
 )
 
 func FromRoot(path string) string {
-	rootPath := os.Getenv("NAMESPOOL_ROOT")
+	rootPath := os.Getenv("NAMESPOOLROOT")
 	newPath := filepath.Join(rootPath, path)
 	return newPath
 }
