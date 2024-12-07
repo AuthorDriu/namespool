@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/AuthorDriu/namespool/internal/repository"
+	dbTypes "github.com/AuthorDriu/namespool/internal/repository"
 	db "github.com/AuthorDriu/namespool/internal/repository/sqlite"
 	"github.com/AuthorDriu/namespool/pkg/path"
 )
@@ -53,15 +53,15 @@ func TestSelectUser(t *testing.T) {
 type ideaTestData struct {
 	title       string
 	description string
-	access      repository.AccessModifier
+	access      dbTypes.AccessModifier
 	owner       string
 }
 
 var ideaData = []ideaTestData{
-	{title: "hug", description: "just hugs", access: repository.IdeaPublic, owner: "cactus"},
-	{title: "suka", description: "insulting project", access: repository.IdeaPublic, owner: "cactus"},
-	{title: "bliat", description: "second insulting project", access: repository.IdeaPublic, owner: "cactus"},
-	{title: "haha", description: "", access: repository.IdeaPrivate, owner: "cactus"},
+	{title: "hug", description: "just hugs", access: dbTypes.IdeaPublic, owner: "cactus"},
+	{title: "suka", description: "insulting project", access: dbTypes.IdeaPublic, owner: "cactus"},
+	{title: "bliat", description: "second insulting project", access: dbTypes.IdeaPublic, owner: "cactus"},
+	{title: "haha", description: "", access: dbTypes.IdeaPrivate, owner: "cactus"},
 }
 
 func TestInsertIdea(t *testing.T) {
