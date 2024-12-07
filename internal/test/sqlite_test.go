@@ -6,14 +6,14 @@ import (
 	"testing"
 
 	"github.com/AuthorDriu/namespool/internal/repository"
-	repo "github.com/AuthorDriu/namespool/internal/repository/sqlite"
+	db "github.com/AuthorDriu/namespool/internal/repository/sqlite"
 	"github.com/AuthorDriu/namespool/pkg/path"
 )
 
 const databasePath string = "store/test_database.db"
 
 func TestPrepareDatabase(t *testing.T) {
-	if err := repo.Prepare(databasePath); err != nil {
+	if err := db.Prepare(databasePath); err != nil {
 		t.Error(err)
 	}
 }
@@ -32,7 +32,7 @@ var userData = []userTestData{
 
 func TestInsertUser(t *testing.T) {
 	for _, data := range userData {
-		_, err := repo.InsertUser(data.nickname, data.password)
+		_, err := db.InsertUser(data.nickname, data.password)
 		if err != nil {
 			t.Errorf("%v, params: %v", err, data)
 		}
@@ -41,7 +41,7 @@ func TestInsertUser(t *testing.T) {
 
 func TestSelectUser(t *testing.T) {
 	for _, data := range userData {
-		user, err := repo.SelectUser(data.nickname)
+		user, err := db.SelectUser(data.nickname)
 		if err != nil {
 			t.Errorf("%v, params: %q", err, data.nickname)
 		} else if !reflect.DeepEqual(user.Password, data.password) {
@@ -66,7 +66,7 @@ var ideaData = []ideaTestData{
 
 func TestInsertIdea(t *testing.T) {
 	for _, idea := range ideaData {
-		_, err := repo.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
+		_, err := db.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
 		if err != nil {
 			t.Error(err)
 		}
@@ -75,7 +75,7 @@ func TestInsertIdea(t *testing.T) {
 
 func TestInsertNotUniqueIdea(t *testing.T) {
 	idea := ideaData[0]
-	_, err := repo.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
+	_, err := db.InsertIdea(idea.title, idea.description, idea.access, idea.owner)
 	if err == nil {
 		t.Error("Inserted not unique idea")
 	}
@@ -83,7 +83,7 @@ func TestInsertNotUniqueIdea(t *testing.T) {
 
 func TestSelectIdea(t *testing.T) {
 	ideaData := ideaData[0]
-	idea, err := repo.SelectIdea(ideaData.owner, ideaData.title)
+	idea, err := db.SelectIdea(ideaData.owner, ideaData.title)
 	if err != nil {
 		t.Errorf("%v, params: {%q, %q}", err, ideaData.owner, ideaData.title)
 	} else if idea.Title != ideaData.title {
@@ -92,7 +92,7 @@ func TestSelectIdea(t *testing.T) {
 }
 
 func TestSelectIdeasByUser(t *testing.T) {
-	ideas, err := repo.SelectIdeasByUser(ideaData[0].owner)
+	ideas, err := db.SelectIdeasByUser(ideaData[0].owner)
 	if err != nil {
 		t.Errorf("%v, params: %q", err, ideaData[0].owner)
 	} else if len(ideas) != len(ideaData) {
@@ -101,7 +101,7 @@ func TestSelectIdeasByUser(t *testing.T) {
 }
 
 func TestSelectPublicIdeasByUser(t *testing.T) {
-	ideas, err := repo.SelectPublicIdeasByUser(ideaData[0].owner)
+	ideas, err := db.SelectPublicIdeasByUser(ideaData[0].owner)
 	if err != nil {
 		t.Errorf("%v, params: %q", err, ideaData[0].owner)
 	} else if len(ideas) != len(ideaData)-1 {
@@ -111,7 +111,7 @@ func TestSelectPublicIdeasByUser(t *testing.T) {
 
 func TestDeleteIdea(t *testing.T) {
 	for _, idea := range ideaData {
-		err := repo.DeleteIdea(idea.owner, idea.title)
+		err := db.DeleteIdea(idea.owner, idea.title)
 		if err != nil {
 			t.Error(err)
 		}
@@ -119,7 +119,7 @@ func TestDeleteIdea(t *testing.T) {
 }
 
 func TestCloseDatabase(t *testing.T) {
-	if err := repo.Close(); err != nil {
+	if err := db.Close(); err != nil {
 		t.Error(err)
 	}
 
